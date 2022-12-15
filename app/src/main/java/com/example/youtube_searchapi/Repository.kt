@@ -71,6 +71,8 @@ class Repository private constructor() {
         val map = HashMap<String, String>()
         map["part"] = "snippet"
         map["q"] = searchText
+        map["type"] = "video"
+        map["maxResults"] = "50"
         map["key"] = ApplicationContext.getContext().resources.getString(R.string.api_key)
         return map
     }

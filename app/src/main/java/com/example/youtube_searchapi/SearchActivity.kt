@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.youtube_searchapi.theme.Youtube_searchApiTheme
 
@@ -59,9 +58,10 @@ class SearchActivity : ComponentActivity() {
     @Composable
     fun SearchBar() {
         Column() {
-            Box {
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(20.dp)) {
                 var text by remember { mutableStateOf(TextFieldValue("")) }
                 TextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = text,
                     onValueChange = {
                         text = it
@@ -80,7 +80,6 @@ class SearchActivity : ComponentActivity() {
                     ) {}
                 }
             }
-
             SearchList(list = search())
         }
     }
