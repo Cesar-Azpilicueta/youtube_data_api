@@ -22,7 +22,7 @@ class Repository private constructor() {
 
     var searchResultMutableLiveData: MutableLiveData<SearchResult> = MutableLiveData()
 
-    var searchResultMutableList = mutableStateListOf<SearchResult>()
+    private var searchResultMutableList = mutableStateListOf<SearchResult>()
 
     init {
         searchResultMutableLiveData.value = SearchResult()
@@ -52,8 +52,8 @@ class Repository private constructor() {
         retrofit.create(RetrofitService::class.java)
     }
 
-    fun search(searchText: String) {
-        val call = service.search(setMap(searchText))
+    fun search(searchText: String, order: String) {
+        val call = service.search(setMap(searchText, order))
         call.enqueue(object : Callback<SearchResult> {
             override fun onResponse(call: Call<SearchResult>, response: Response<SearchResult>) {
                 searchResultMutableLiveData.postValue(response.body())
@@ -67,12 +67,13 @@ class Repository private constructor() {
         })
     }
 
-    private fun setMap(searchText: String): HashMap<String, String> {
+    private fun setMap(searchText: String, order: String): HashMap<String, String> {
         val map = HashMap<String, String>()
         map["part"] = "snippet"
         map["q"] = searchText
         map["type"] = "video"
-        map["maxResults"] = "50"
+        map["maxResults"] = "10"
+        map["order"] = order
         map["key"] = ApplicationContext.getContext().resources.getString(R.string.api_key)
         return map
     }
@@ -81,7 +82,7 @@ class Repository private constructor() {
         return searchResultMutableLiveData
     }
 
-    fun getSearchResultList() : MutableList<SearchResult> {
+    fun getSearchResultList(): MutableList<SearchResult> {
         return searchResultMutableList
     }
 }

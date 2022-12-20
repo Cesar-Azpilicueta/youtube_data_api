@@ -15,8 +15,8 @@ class SearchViewModel : ViewModel() {
         return liveData
     }
 
-    fun search(searchText : String) {
-        repository.search(searchText)
+    fun search(searchText : String,order : String = "date") {
+        repository.search(searchText,order)
     }
 
     fun onResultChange() {

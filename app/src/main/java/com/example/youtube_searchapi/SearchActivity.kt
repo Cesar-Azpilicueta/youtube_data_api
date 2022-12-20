@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.example.youtube_searchapi.theme.Youtube_searchApiTheme
 
@@ -33,7 +34,9 @@ class SearchActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        SearchBar()
+//                        SearchBar()
+                        TestView(searchViewModel)
+                        SearchList(list = search())
                     }
                 }
             }
@@ -44,7 +47,11 @@ class SearchActivity : ComponentActivity() {
     @Composable
     fun DefaultPreview() {
         Youtube_searchApiTheme {
-            SearchBar()
+            Column() {
+                TestView(searchViewModel)
+                SearchList(list = search())
+            }
+            
         }
     }
 
@@ -58,7 +65,10 @@ class SearchActivity : ComponentActivity() {
     @Composable
     fun SearchBar() {
         Column() {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(20.dp)) {
+            Box(modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+                .padding(20.dp)) {
                 var text by remember { mutableStateOf(TextFieldValue("")) }
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
