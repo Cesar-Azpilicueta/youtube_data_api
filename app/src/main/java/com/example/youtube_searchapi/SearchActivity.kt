@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.example.youtube_searchapi.theme.Youtube_searchApiTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
 class SearchActivity : ComponentActivity() {
 
@@ -51,7 +56,7 @@ class SearchActivity : ComponentActivity() {
                 TestView(searchViewModel)
                 SearchList(list = search())
             }
-            
+
         }
     }
 
@@ -65,17 +70,19 @@ class SearchActivity : ComponentActivity() {
     @Composable
     fun SearchBar() {
         Column() {
-            Box(modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .fillMaxWidth()
-                .padding(20.dp)) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
                 var text by remember { mutableStateOf(TextFieldValue("")) }
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = text,
                     onValueChange = {
                         text = it
-                    }
+                    },
                 )
                 Box(
                     Modifier
@@ -96,14 +103,26 @@ class SearchActivity : ComponentActivity() {
 
     @Composable
     fun SearchList(list: MutableList<SearchItems>) {
+        val scrollState = rememberLazyListState()
+
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            state = scrollState
         ) {
             itemsIndexed(
                 list
             ) { index, item ->
                 SearchItemList(result = item, index = index)
             }
+        }
+        LaunchedEffect(scrollState) {
+            snapshotFlow { scrollState.firstVisibleItemIndex }
+                .map { index -> index == list.lastIndex}
+                .distinctUntilChanged()
+                .collect {
+                    println("Hello ${list.size}")
+                }
+            println("stateTest$scrollState")
         }
     }
 

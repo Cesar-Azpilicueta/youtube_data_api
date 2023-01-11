@@ -12,6 +12,7 @@ data class SearchItems(
 data class SearchItemsId(
     @SerializedName("kind") var kind: String = "",
     @SerializedName("channelId") var channelId: String = "",
+    @SerializedName("videoId") var videoId: String = ""
 )
 
 data class SearchItemsSnippet(

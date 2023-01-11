@@ -6,32 +6,45 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.youtube_searchapi.theme.Youtube_searchApiTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TestView(vm: SearchViewModel) {
     var text by remember { mutableStateOf(TextFieldValue("")) }
-    val options = listOf("최신", "평가", "관련도", "제목", "조회수")
+    val options = listOf("관련도", "평가", "최신", "제목", "조회수")
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
-    var orderText = ""
+    var orderText = "relevance"
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
         val (tf, sm, btn) = createRefs()
         TextField(
             modifier = Modifier.constrainAs(tf) {
-                start.linkTo(parent.start, margin = 20.dp)
+                start.linkTo(parent.start, margin = 30.dp)
                 end.linkTo(sm.start, margin = 10.dp)
+            }.onKeyEvent {
+                         if(it.key.keyCode == Key.Enter.keyCode) {
+                             vm.search(text.text, orderText)
+                         }
+                false
             },
             value = text,
             onValueChange = {
                 text = it
-            }
+            },
+            singleLine = true
         )
         Box(modifier = Modifier.constrainAs(sm) {
             start.linkTo(tf.end, margin = 10.dp)
@@ -84,13 +97,38 @@ fun TestView(vm: SearchViewModel) {
                 .width(30.dp)
                 .height(30.dp)
                 .constrainAs(btn) {
-                    end.linkTo(parent.end, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 30.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
         ) {}
     }
 }
+
+/*@Composable
+fun Modifier.clearFocusOnKeyboardDismiss(): Modifier  {
+    var isFocused by remember { mutableStateOf(false) }
+    var keyboardAppearedSinceLastFocused by remember { mutableStateOf(false) }
+    if (isFocused) {
+        val imeIsVisible = LocalWindowInsets.current.ime.isVisible
+        val focusManager = LocalFocusManager.current
+        LaunchedEffect(imeIsVisible) {
+            if (imeIsVisible) {
+                keyboardAppearedSinceLastFocused = true
+            } else if (keyboardAppearedSinceLastFocused) {
+                focusManager.clearFocus()
+            }
+        }
+    }
+    onFocusEvent {
+        if (isFocused != it.isFocused) {
+            isFocused = it.isFocused
+            if (isFocused) {
+                keyboardAppearedSinceLastFocused = false
+            }
+        }
+    }
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

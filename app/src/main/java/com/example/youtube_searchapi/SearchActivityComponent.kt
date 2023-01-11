@@ -1,5 +1,7 @@
 package com.example.youtube_searchapi
 
+import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -12,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
@@ -19,9 +22,10 @@ import com.bumptech.glide.integration.compose.GlideImage
 @Composable
 fun SearchItemList(result: SearchItems, index: Int) {
     val context = LocalContext.current
-    val title = result.snippet.title
+    val title = specialCharConversion(result.snippet.title)
     val description = result.snippet.description
     val thumbnails = result.snippet.thumbnails.default.url
+    val videoId = result.id.videoId
     Card(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
@@ -31,6 +35,9 @@ fun SearchItemList(result: SearchItems, index: Int) {
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         onClick = {
             Toast.makeText(context, "card $index", Toast.LENGTH_SHORT).show()
+            val intent = Intent(context,ViewActivity::class.java)
+            intent.putExtra("videoId",videoId)
+            startActivity(context,intent,null)
         }
 
     ) {
@@ -62,5 +69,40 @@ fun Thumbnails(image: String) {
     ) {
         it.thumbnail()
             .centerCrop()
+    }
+}
+
+fun specialCharConversion(text: String): String {
+    var beforeText: String = ""
+    var decimalNum = ""
+    var specialCase: String = ""
+    var checkPoint: Int = 0
+
+    if (text.contains("&#")) {
+        checkPoint = 1
+        beforeText = text.substring(text.indexOf("&"), text.indexOf(";") + 1)
+        decimalNum = beforeText.substring(beforeText.indexOf("#") + 1, beforeText.indexOf(";"))
+    } else if (text.contains("&")) {
+        checkPoint = 2
+        beforeText = text.substring(text.indexOf("&"), text.indexOf(";") + 1)
+        println("checkPoint 2 $beforeText")
+        when (beforeText) {
+            "&nbsp;" -> specialCase = text.replace("&nbsp;", " ")
+            "&lt;" -> specialCase = text.replace("&lt;", "<")
+            "&gt;" -> specialCase = text.replace("&gt;", ">")
+            "&amp;" -> specialCase = text.replace("&amp;", "&")
+            "&quot;" -> specialCase = text.replace("&quot;", "\"")
+        }
+    }
+    val afterText: Char = if (decimalNum != "") {
+        decimalNum.toInt().toChar()
+    } else {
+        'a'
+    }
+
+    return when (checkPoint) {
+        1 -> text.replace(beforeText, afterText.toString())
+        2 -> specialCase
+        else -> text
     }
 }

@@ -58,7 +58,7 @@ class Repository private constructor() {
             override fun onResponse(call: Call<SearchResult>, response: Response<SearchResult>) {
                 searchResultMutableLiveData.postValue(response.body())
 //                searchResultMutableList[0] = response.body()!!
-                Log.d("autoLogin", "onResponse: ${response.body()}")
+                Log.d("Repository-search", "onResponse: ${response.body()}")
             }
 
             override fun onFailure(call: Call<SearchResult>, t: Throwable) {
